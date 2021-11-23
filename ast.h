@@ -48,3 +48,19 @@ struct term {
 // This function walk throught the AST and prints the structure
 // Very helpful for debugging purposes
 void astWalk(struct ast *as);
+
+struct term* newTerm(enum termType t, int v);
+
+struct exp* newExprTerm(struct term* te);
+
+struct exp* newExpr(struct exp* e1, enum logicOp op, struct exp* e2);
+
+struct action* newAction(struct exp* ex);
+
+struct pattern* newPattern(struct exp* ex);
+
+struct pattern* newPatternBegin();
+
+struct pattern* newPatternEnd();
+
+struct ast* newStatement(struct pattern* pa, struct action* ac);

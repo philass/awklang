@@ -1,6 +1,73 @@
 #include "ast.h"
 #include <stddef.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+
+struct term* newTerm(enum termType t, int v) {
+  struct term *te = malloc(sizeof(struct term));
+  te->type = t; 
+  te->val = v; 
+  return te;
+}
+
+struct exp* newExprTerm(struct term* te) {
+  struct exp *e = malloc(sizeof(struct exp));
+  e->isTerm = true;
+  e->t = te;
+  e->le = NULL;
+  e->re = NULL;
+  return e;
+}
+
+
+struct exp* newExpr(struct exp* e1, enum logicOp op, struct exp* e2) {
+  struct exp *e = malloc(sizeof(struct exp));
+  e->isTerm = false;
+  e->t = NULL;
+  e->le = e1;
+  e->re = e2;
+  return e;
+}
+
+struct action* newAction(struct exp* ex) {
+  struct action *a = malloc(sizeof(struct action));
+  a->e = ex;
+  return a;
+}
+
+struct pattern* newPattern(struct exp* ex) {
+  struct pattern *pa = malloc(sizeof(struct pattern));
+  pa->e = ex;
+  pa->begin = false;
+  pa->end = false;
+  return pa;
+}
+
+struct pattern* newPatternBegin() {
+  struct pattern *pa = malloc(sizeof(struct pattern));
+  pa->e = NULL;
+  pa->begin = true;
+  pa->end = false;
+  return pa;
+}
+
+struct pattern* newPatternEnd() {
+  struct pattern *pa = malloc(sizeof(struct pattern));
+  pa->e = NULL;
+  pa->begin = false;
+  pa->end = true;
+  return pa;
+}
+
+struct ast* newStatement(struct pattern* pa, struct action* ac) {
+  struct ast *as = malloc(sizeof(struct ast));
+  as->nodetype = 0; // TODO: See if this is needed at all
+  as->p = pa;
+  as->a = ac;
+  as->next = NULL;
+  return as;
+}
 
 void walkTerm(struct term *t) {
   if (t == NULL) {
@@ -71,3 +138,4 @@ void astWalk(struct ast *as) {
     astWalk(as->next);
   }
 }
+

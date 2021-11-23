@@ -15,16 +15,17 @@
 
 %%
 
-statements: /* nothing */
-  | statements statement { /*Do something */  }
+//statements: /* nothing */
+//  | statements statement { /*Do something */  }
+//  ;
+//
+
+statement: pattern LCURL action RCURL { $$ = newStatement($1, $3); }
   ;
 
-statement: pattern LCURL action RCURL { /*Do something  */ }
-  ;
-
-pattern: expr { /* Do something */ }
-  | BEG { /* Do something */ }
-  | END  { /* Do something */ }
+pattern: expr { $$ = newPattern($1); }
+  | BEG { $$ = newPatternBegin(); }
+  | END  { $$ = newPatternEnd(); }
   ;
 
 logic: AND 
@@ -55,16 +56,23 @@ logic: AND
   }
   ;
 
-expr: term { /* Do something */ }
-  | expr logic term { /* Do something */ }
+expr: term { $$ = newExprTerm($1); }
+  | expr logic term { $$ = newExpr($1, $2, $3); }
   ;
 
-term: POSITIONALARG { /* Do something */ }
-  | NUM { /* Do something */ }
+term: POSITIONALARG 
+  { 
+    $$ = newTerm(Positional, $1);
+  }
+  | NUM 
+  { 
+    $$ = newTerm(Constant, $1);
+  }
   ;
 
 action: /* nothing */
-  PRINT expr { /* Do something */ }
+  //PRINT expr { /* Do something */ }
+  expr { newAction($1); }
   ;
 
 
