@@ -1,7 +1,9 @@
 #include "ast.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+// TODO: change this later to handle longer lines
 int MAX_LINE_LENGTH = 1024;
 
 bool isSpace(char letter) {
@@ -42,8 +44,45 @@ void getWordIdxs(char *line, int **startIdxs, int **endIdxs, int *wordCount) {
   *wordCount = numWords;
 }
   
+int evalTerm(struct term *t, char* line, int *startIdxs, int *endIdxs, int wordCount) {
+  if (t->type == Constant) {
+    return t->val;
+  }
+  if (t->type == Positional) {
+    int pos = t->val;
+    if (pos > wordCount) {
+      //don't do anything; variable doesn't exist
+    }
+    int wordLength = endIdxs[pos-1] - startIdxs[pos-1] + 1;
+    int offset = startIdxs[pos-1];
+    char str[wordLength];
+    strcpy(str, line + offset, wordLength);
+    int value = atoi(str);
+    return value;
+  }
+}
+    
+    
+
+}
+
+void evalAction(struct action *a, char* line, int *startIdxs, int *endIdxs, int wordCount) {
+  if (a->e != NULL) {
+    if (e->isTerm) {
+      int value = evalTerm(e->t, line, startIdxs, endIdxs, wordCount);
+      printf("Value was \d\n", value);
+    } else {
+      printf("This branch has not been implemented\n");
+    }
+  } else {
+    printf("This was an empty action\n");
+  }
+}
+
+
 void eval(struct ast *a, FILE *f) {
   char line[MAX_LINE_LENGTH];
+
   while (fgets(line, MAX_LINE_LENGTH, f) != NULL) {
     // Break line up into words
     // Possible representation array for word starts, and word ends
@@ -56,15 +95,21 @@ void eval(struct ast *a, FILE *f) {
     int numWords;
     getWordIdxs(line, &startIdxs, &endIdxs, &numWords);
 
+    // Now maybe test a dummy struct here"
     // Loop is for debug purposes
+
     for (int i = 0; i < numWords; i++) {
       printf("%d word is characaters %d - %d\n", i+1, startIdxs[i], endIdxs[i]);
     }
+    
+
+
     // Free memory
     free(startIdxs);
     free(endIdxs);
   }
 }
+
 
 int main() {
   FILE *fp = fopen("test.txt", "r");

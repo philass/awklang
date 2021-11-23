@@ -1,11 +1,16 @@
 #include <stdbool.h>
 
 enum logicOp { 
-  AND, 
-  OR,
-  GT,
-  LT,
-  EQ
+  ANDOp, 
+  OROp,
+  GTOp,
+  LTOp,
+  EQOp
+};
+
+enum termType { 
+  Positional, 
+  Constant
 };
 
 struct ast {
@@ -35,10 +40,11 @@ struct exp {
 };
 
 struct term {
-  int type;
+  enum termType type;
   int val;
 };
 
-int main() {
-  return 0;
-}
+
+// This function walk throught the AST and prints the structure
+// Very helpful for debugging purposes
+void astWalk(struct ast *as);
