@@ -1,4 +1,4 @@
-parser: lexer.l parser.y
+parser: lexer.l parser.y ast.c
 	bison -d parser.y
 	flex lexer.l
 	cc -o ast.o -c ast.c

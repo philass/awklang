@@ -2,16 +2,35 @@
 #include <stdio.h>
 #include "ast.h"
 
+struct ast* result;
 
 %}
 
-%token NUM
-%token POSITIONALARG
-%token AND OR GT LT EQ
-%token LCURL RCURL
-%token BEG END
-%token PRINT
-%token EOL
+
+%union {
+ enum logicOp logicOpT;
+ struct ast* astT;
+ struct pattern* patternT;
+ struct action* actionT;
+ struct exp* expT;
+ struct term* termT;
+ int integer;
+}
+
+%token <integer> NUM;
+%token <integer> POSITIONALARG;
+%token AND OR GT LT EQ;
+%token LCURL RCURL;
+%token BEG END;
+%token PRINT;
+%token EOL;
+
+%type <astT> statement
+%type <patternT> pattern
+%type <actionT> action
+%type <expT> expr
+%type <termT> term
+%type <logicOpT> logic
 
 %%
 
@@ -20,7 +39,10 @@
 //  ;
 //
 
-statement: pattern LCURL action RCURL { $$ = newStatement($1, $3); }
+statement: pattern LCURL action RCURL { 
+                                        result = newStatement($1, $3);
+                                        astWalk(result);
+                                      }
   ;
 
 pattern: expr { $$ = newPattern($1); }
@@ -57,7 +79,7 @@ logic: AND
   ;
 
 expr: term { $$ = newExprTerm($1); }
-  | expr logic term { $$ = newExpr($1, $2, $3); }
+  | expr logic expr { $$ = newExpr($1, $2, $3); }
   ;
 
 term: POSITIONALARG 
@@ -72,16 +94,20 @@ term: POSITIONALARG
 
 action: /* nothing */
   //PRINT expr { /* Do something */ }
-  expr { newAction($1); }
+  expr { $$ = newAction($1); }
   ;
 
 
 %%
 
 int main(int argc, char **arg) {
-  yyparse();
+  int res = yyparse();
+  printf("yyparse result is %d\n", res);
+  printf("finished the parsing\n");
 }
 
 void yyerror(char *s) {
   fprintf(stderr, "error: %s\n", s);
+
+
 }

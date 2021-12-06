@@ -32,7 +32,7 @@ struct action {
 };
 
 struct exp {
-  bool isTerm;
+  bool isTerm; // 0 for Number | 1 for postional
   enum logicOp op;
   struct term *t;
   struct exp *le;
